@@ -17,9 +17,10 @@ python train.py \
     --lora_modules all \
     --double_quant \
     --warmup_ratio 0.03 \
+    --use_auth_token True \
     --lr_scheduler_type constant \
     --gradient_checkpointing \
-    --dataset oasst1 \
+    --dataset_name qnguyen3/shareGPT_Viet_SFT \
     --max_seq_length 2048 \
     --per_device_train_batch_size 1 \
     --gradient_accumulation_steps 16 \
