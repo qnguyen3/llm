@@ -1,4 +1,5 @@
 import transformers
+from typing import Any, Dict
 
 IGNORE_INDEX = -100
 DEFAULT_PAD_TOKEN = "[PAD]"

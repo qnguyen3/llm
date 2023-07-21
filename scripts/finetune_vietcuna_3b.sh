@@ -17,6 +17,7 @@ python train.py \
     --lora_modules all \
     --double_quant \
     --warmup_ratio 0.03 \
+    --report_to wandb \
     --use_auth_token True \
     --lr_scheduler_type constant \
     --gradient_checkpointing \
