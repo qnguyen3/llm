@@ -1,28 +1,12 @@
 import importlib
-import sys
-
-if sys.version_info[0] < 3.8:
-    _is_python_greater_3_8 = False
-else:
-    _is_python_greater_3_8 = True
+import bitsandbytes as bnb
 
 
 def is_peft_available():
     return importlib.util.find_spec("peft") is not None
 
-
-def is_torch_greater_2_0():
-    if _is_python_greater_3_8:
-        from importlib.metadata import version
-
-        torch_version = version("torch")
-    else:
-        import pkg_resources
-
-        torch_version = pkg_resources.get_distribution("torch").version
-    return torch_version >= "2.0"
-
 import os
+from os.path import exists, join, isdir
 import random
 import warnings
 from dataclasses import dataclass
@@ -495,3 +479,39 @@ def pad_to_length(tensor: torch.Tensor, length: int, pad_value: Union[int, float
             ],
             dim=dim,
         )
+    
+def find_all_linear_names(args, model):
+    cls = bnb.nn.Linear4bit if args.bits == 4 else (bnb.nn.Linear8bitLt if args.bits == 8 else torch.nn.Linear)
+    lora_module_names = set()
+    for name, module in model.named_modules():
+        if isinstance(module, cls):
+            names = name.split('.')
+            lora_module_names.add(names[0] if len(names) == 1 else names[-1])
+
+
+    if 'lm_head' in lora_module_names: # needed for 16-bit
+        lora_module_names.remove('lm_head')
+    return list(lora_module_names)
+
+def get_last_checkpoint(checkpoint_dir):
+    if isdir(checkpoint_dir):
+        is_completed = exists(join(checkpoint_dir, 'completed'))
+        if is_completed: return None, True # already finished
+        max_step = 0
+        for filename in os.listdir(checkpoint_dir):
+            if isdir(join(checkpoint_dir, filename)) and filename.startswith('checkpoint'):
+                max_step = max(max_step, int(filename.replace('checkpoint-', '')))
+        if max_step == 0: return None, is_completed # training started, but no checkpoint
+        checkpoint_dir = join(checkpoint_dir, f'checkpoint-{max_step}')
+        print(f"Found a previous checkpoint at: {checkpoint_dir}")
+        return checkpoint_dir, is_completed # checkpoint found!
+    return None, False # first training
+
+def print_trainable_parameters(model):
+    trainable_params = 0
+    all_param = 0
+    for _, param in model.named_parameters():
+        all_param += param.numel()
+        if param.requires_grad:
+            trainable_params += param.numel()
+    print(f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param}")

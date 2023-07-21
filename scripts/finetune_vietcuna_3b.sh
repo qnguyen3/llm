@@ -1,0 +1,32 @@
+python train.py \
+    --model_name vilm/vietcuna-7b-v2 \
+    --output_dir ./output/vietcuna-7b-v2.1 \
+    --logging_steps 10 \
+    --save_strategy steps \
+    --data_seed 42 \
+    --save_steps 500 \
+    --save_total_limit 40 \
+    --evaluation_strategy steps \
+    --per_device_eval_batch_size 1 \
+    --dataloader_num_workers 3 \
+    --logging_strategy steps \
+    --remove_unused_columns False \
+    --peft_lora_r 64 \
+    --peft_lora_alpha 16 \
+    --lora_modules all \
+    --double_quant \
+    --warmup_ratio 0.03 \
+    --lr_scheduler_type constant \
+    --gradient_checkpointing \
+    --dataset oasst1 \
+    --max_seq_length 2048 \
+    --per_device_train_batch_size 1 \
+    --gradient_accumulation_steps 16 \
+    --num_train_epochs 1 \
+    --eval_steps 100 \
+    --learning_rate 0.0002 \
+    --adam_beta2 0.999 \
+    --max_grad_norm 0.3 \
+    --lora_dropout 0.1 \
+    --weight_decay 0.0 \
+    --seed 0
