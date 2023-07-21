@@ -146,6 +146,39 @@ class TrainingArguments(transformers.Seq2SeqTrainingArguments):
     save_steps: int = field(default=250, metadata={"help": 'How often to save a model'})
     save_total_limit: int = field(default=40, metadata={"help": 'How many checkpoints to save before the oldest is overwritten'})
 
+@dataclass
+class GenerationArguments:
+    # For more hyperparameters check:
+    # https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig
+    # Length arguments
+    max_new_tokens: Optional[int] = field(
+        default=256,
+        metadata={"help": "Maximum number of new tokens to be generated in evaluation or prediction loops"
+                          "if predict_with_generate is set."}
+    )
+    min_new_tokens : Optional[int] = field(
+        default=None,
+        metadata={"help": "Minimum number of new tokens to generate."}
+    )
+
+    # Generation strategy
+    do_sample: Optional[bool] = field(default=False)
+    num_beams: Optional[int] = field(default=1)
+    num_beam_groups: Optional[int] = field(default=1)
+    penalty_alpha: Optional[float] = field(default=None)
+    use_cache: Optional[bool] = field(default=True)
+
+    # Hyperparameters for logit manipulation
+    temperature: Optional[float] = field(default=1.0)
+    top_k: Optional[int] = field(default=50)
+    top_p: Optional[float] = field(default=1.0)
+    typical_p: Optional[float] = field(default=1.0)
+    diversity_penalty: Optional[float] = field(default=0.0)
+    repetition_penalty: Optional[float] = field(default=1.0)
+    length_penalty: Optional[float] = field(default=1.0)
+    no_repeat_ngram_size: Optional[int] = field(default=0)
+
+
 def print_trainable_parameters(args, model):
     """
     Prints the number of trainable parameters in the model.
@@ -179,12 +212,13 @@ def get_last_checkpoint(checkpoint_dir):
 
 def train():
     hfparser = transformers.HfArgumentParser((
-        ModelArguments, DataArguments, TrainingArguments
+        ModelArguments, DataArguments, TrainingArguments, GenerationArguments
     ))
-    model_args, data_args, training_args, extra_args = \
+    model_args, data_args, training_args, generation_args, extra_args = \
         hfparser.parse_args_into_dataclasses(return_remaining_strings=True)
+    training_args.generation_config = transformers.GenerationConfig(**vars(generation_args))
     args = argparse.Namespace(
-        **vars(model_args), **vars(data_args)
+        **vars(model_args), **vars(data_args), **vars(training_args)
     )
     print(args)
 
