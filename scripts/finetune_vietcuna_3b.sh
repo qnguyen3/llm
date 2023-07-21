@@ -1,6 +1,6 @@
 python train.py \
-    --model_name vilm/vietcuna-7b-v2 \
-    --output_dir ./output/vietcuna-7b-v2.1 \
+    --model_name vilm/vietcuna-3b-v2 \
+    --output_dir ./output/vietcuna-3b-v2.1 \
     --logging_steps 10 \
     --save_strategy steps \
     --data_seed 42 \
@@ -13,6 +13,7 @@ python train.py \
     --remove_unused_columns False \
     --peft_lora_r 64 \
     --peft_lora_alpha 16 \
+    --load_in_4bit True \
     --lora_modules all \
     --double_quant \
     --warmup_ratio 0.03 \

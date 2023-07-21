@@ -13,6 +13,7 @@ python train.py \
     --remove_unused_columns False \
     --peft_lora_r 64 \
     --peft_lora_alpha 16 \
+    --load_in_4bit True \
     --lora_modules all \
     --double_quant \
     --warmup_ratio 0.03 \
