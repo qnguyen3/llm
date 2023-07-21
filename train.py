@@ -181,7 +181,7 @@ def train():
     hfparser = transformers.HfArgumentParser((
         ModelArguments, DataArguments, TrainingArguments
     ))
-    model_args, data_args, generation_args, extra_args = \
+    model_args, data_args, training_args, extra_args = \
         hfparser.parse_args_into_dataclasses(return_remaining_strings=True)
     args = argparse.Namespace(
         **vars(model_args), **vars(data_args)
