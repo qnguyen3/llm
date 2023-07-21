@@ -10,7 +10,7 @@ import pandas as pd
 import torch
 import transformers
 from torch.nn.utils.rnn import pad_sequence
-from transformers
+import transformers
 from datasets import load_dataset, Dataset
 
 IGNORE_INDEX = -100
