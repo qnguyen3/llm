@@ -85,3 +85,6 @@ def main():
     max_seq_length=script_args.max_seq_length)
 
     trainer.train()
+
+if __name__ == '__main__':
+    main()
