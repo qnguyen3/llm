@@ -181,11 +181,10 @@ def train():
     hfparser = transformers.HfArgumentParser((
         ModelArguments, DataArguments, TrainingArguments
     ))
-    model_args, data_args, training_args, generation_args, extra_args = \
+    model_args, data_args, generation_args, extra_args = \
         hfparser.parse_args_into_dataclasses(return_remaining_strings=True)
-    training_args.generation_config = transformers.GenerationConfig(**vars(generation_args))
     args = argparse.Namespace(
-        **vars(model_args), **vars(data_args), **vars(training_args)
+        **vars(model_args), **vars(data_args)
     )
     print(args)
 
