@@ -43,8 +43,8 @@ def get_accelerate_model(args):
     model = AutoModelForCausalLM.from_pretrained(
         args.model_name,
         cache_dir=args.cache_dir,
-        load_in_4bit=args.bits == 4,
-        load_in_8bit=args.bits == 8,
+        load_in_4bit=args.load_in_4bit,
+        load_in_8bit=args.load_in_8bit,
         device_map=device_map,
         max_memory=max_memory,
         quantization_config=quantization_config,
@@ -57,7 +57,7 @@ def get_accelerate_model(args):
 
     # Tokenizer
     tokenizer = AutoTokenizer.from_pretrained(
-        args.model_name_or_path,
+        args.model_name,
         cache_dir=args.cache_dir,
         padding_side="right",
         use_fast=False, # Fast tokenizer giving issues.
@@ -106,6 +106,15 @@ def get_accelerate_model(args):
             bias="none",
             task_type="CAUSAL_LM",
         )
-        # model = get_peft_model(model, config)
+        model = get_peft_model(model, config)
+    for name, module in model.named_modules():
+        if isinstance(module, LoraLayer):
+            module = module.to(torch.bfloat16)
+        if 'norm' in name:
+            module = module.to(torch.float32)
+        if 'lm_head' in name or 'embed_tokens' in name:
+            if hasattr(module, 'weight'):
+                if module.weight.dtype == torch.float32:
+                    module = module.to(torch.bfloat16)
 
-    return model, config
+    return model, tokenizer

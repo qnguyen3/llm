@@ -48,6 +48,8 @@ class ScriptArguments:
     report_to: str = field(default='none', metadata={"help": "To use wandb or something else for reporting."})
     adam8bit: bool = field(default=False, metadata={"help": "Use 8-bit adam."})
     lora_dropout: float = field(default=0.0, metadata={"help":"Lora dropout."})
+    seed: int = field(default=0, metadata={"help": "random seed"})
+    num_train_epochs: int = field(default=1, metadata={"help": "train epoch"})
 
 
 def main():
@@ -55,7 +57,7 @@ def main():
     script_args = parser.parse_args_into_dataclasses()[0]
 
     if script_args.use_peft:
-        model, peft_config = get_accelerate_model(script_args)
+        model, tokenizer = get_accelerate_model(script_args)
 
     dataset = load_dataset(script_args.dataset_name, split="train")
 
@@ -71,6 +73,7 @@ def main():
     gradient_accumulation_steps=script_args.gradient_accumulation_steps,
     learning_rate=script_args.learning_rate,
     logging_steps=script_args.logging_steps,
+    num_train_epochs=script_args.num_train_epochs
     )
 
     trainer = SFTTrainer(
@@ -78,6 +81,7 @@ def main():
     args=training_args,
     train_dataset=dataset,
     dataset_text_field=script_args.dataset_text_field,
-    peft_config=peft_config)
+    tokenizer=tokenizer,
+    max_seq_length=script_args.max_seq_length)
 
     trainer.train()

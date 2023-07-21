@@ -143,20 +143,11 @@ class SFTTrainer(Trainer):
                         model,
                     )
 
-                # if getattr(model, "is_loaded_in_8bit", False) or getattr(model, "is_loaded_in_4bit", False):
-                #     model = prepare_model_for_int8_training(model)
+                if getattr(model, "is_loaded_in_8bit", False) or getattr(model, "is_loaded_in_4bit", False):
+                    model = prepare_model_for_int8_training(model)
 
                 model = get_peft_model(model, peft_config)
 
-                for name, module in model.named_modules():
-                    if isinstance(module, LoraLayer):
-                        module = module.to(torch.bfloat16)
-                    if 'norm' in name:
-                        module = module.to(torch.float32)
-                    if 'lm_head' in name or 'embed_tokens' in name:
-                        if hasattr(module, 'weight'):
-                            if module.weight.dtype == torch.float32:
-                                module = module.to(torch.bfloat16)
 
             if callbacks is None:
                 callbacks = [PeftSavingCallback]
