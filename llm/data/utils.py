@@ -12,6 +12,7 @@ import transformers
 from torch.nn.utils.rnn import pad_sequence
 import transformers
 from datasets import load_dataset, Dataset
+from .convo import get_conv_template
 
 IGNORE_INDEX = -100
 DEFAULT_PAD_TOKEN = "[PAD]"
@@ -128,6 +129,29 @@ def extract_alpaca_dataset(example):
     else:
         prompt_format = ALPACA_PROMPT_DICT["prompt_no_input"]
     return {'input': prompt_format.format(**example)}
+
+def extract_fastchat_dataset(example):
+    conv = get_conv_template("vicuna_v1.1", system_prompt=example['system_prompt'])
+    roles = {"human": conv.roles[0], "gpt": conv.roles[1]}
+
+    source = example['conversation']
+    # Apply prompt templates
+    conversations = []
+    if roles[source[0]["from"]] != conv.roles[0]:
+        # Skip the first one if it is not from human
+        source = source[1:]
+
+    conv.messages = []
+    for j, sentence in enumerate(source):
+        role = roles[sentence["from"]]
+        assert role == conv.roles[j % 2], f"{i}"
+        conv.append_message(role, sentence["value"])
+
+    role, output = conv.messages.pop()
+    conv.append_message(role, None)
+
+    prompt = conv.get_prompt()
+    return {'input': prompt, 'output': output}
 
 def local_dataset(dataset_name):
     if dataset_name.endswith('.json'):
