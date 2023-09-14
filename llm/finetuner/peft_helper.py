@@ -120,8 +120,8 @@ def get_accelerate_model(args, checkpoint_dir):
             config = LoraConfig(
                 r=args.lora_r,
                 lora_alpha=args.lora_alpha,
-                # target_modules=["q_proj", "v_proj"],
-                target_modules=modules,
+                target_modules=["q_proj", "v_proj"],
+                # target_modules=modules,
                 lora_dropout=args.lora_dropout,
                 bias="none",
                 task_type="CAUSAL_LM",
