@@ -81,7 +81,7 @@ from transformers import (
     Trainer,
     TrainingArguments,
 )
-from datasets import load_from_disk
+from datasets import load_dataset
 import torch
 
 import bitsandbytes as bnb
@@ -237,7 +237,7 @@ def training_function(args):
     # set seed
     set_seed(args.seed)
 
-    dataset = load_from_disk(args.dataset_path)
+    dataset = load_dataset(args.dataset_path)
     # load model from the hub with a bnb config
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
