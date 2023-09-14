@@ -253,7 +253,8 @@ def training_function(args):
         else True,  # this is needed for gradient checkpointing
         device_map="auto",
         quantization_config=bnb_config,
-        use_auth_token=True
+        use_auth_token=True,
+        max_memory = {i: '46000MB' for i in range(torch.cuda.device_count())}
     )
 
     # create peft config
