@@ -213,7 +213,7 @@ def make_data_module(tokenizer: transformers.PreTrainedTokenizer, args) -> Dict:
         elif dataset_name == 'vicuna':
             raise NotImplementedError("Vicuna data was not released.")
         elif dataset_name == 'vilm':
-            return load_dataset("qnguyen3/shareGPT_Viet_SFT")
+            return load_dataset("qnguyen3/multilang_chat_full")
         else:
             if os.path.exists(dataset_name):
                 try:
