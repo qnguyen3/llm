@@ -35,11 +35,11 @@ def get_accelerate_model(args, checkpoint_dir):
     max_memory = {i: max_memory for i in range(n_gpus)}
     device_map = "auto"
 
-    # # if we are in a distributed setting, we need to set the device map and max memory per device
-    # if os.environ.get('LOCAL_RANK') is not None:
-    #     local_rank = int(os.environ.get('LOCAL_RANK', '0'))
-    #     device_map = {'': local_rank}
-    #     max_memory = {'': max_memory[local_rank]}
+    # if we are in a distributed setting, we need to set the device map and max memory per device
+    if os.environ.get('LOCAL_RANK') is not None:
+        local_rank = int(os.environ.get('LOCAL_RANK', '0'))
+        device_map = {'': local_rank}
+        max_memory = {'': max_memory[local_rank]}
 
 
     if args.full_finetune: assert args.bits in [16, 32]
