@@ -120,7 +120,7 @@ class TrainingArguments(transformers.Seq2SeqTrainingArguments):
         metadata={"help":"Lora dropout."}
     )
     max_memory_MB: int = field(
-        default=80000,
+        default=200000,
         metadata={"help": "Free memory per gpu."}
     )
     report_to: str = field(
